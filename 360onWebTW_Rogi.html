@@ -801,21 +801,38 @@ document.getElementById('guidelineRotateBtn').addEventListener('click', function
             overlay.style.display = 'none';
         }
 
-        function loadSampleImage() {
-            if (location.protocol === 'file:') {
-                console.log('Local environment detected. Sample image loading skipped.');
-                return;
-            }
-            const sampleImage = new Image();
-            sampleImage.onload = function() {
-                originalImage = sampleImage;
-                createWorkingImages();
-            };
-            sampleImage.onerror = function() {
-                console.log('Yamabuki.jpg is not available. select 360 image');
-            };
-            sampleImage.src = './Yamabuki.jpg';
-        }
+function loadSampleImage() {
+    if (location.protocol === 'file:') {
+        console.log('Local environment detected. Sample image loading skipped.');
+        return;
+    }
+    const sampleImage = new Image();
+    sampleImage.onload = function() {
+        // 画像を左に90°回転させたバージョンを作成
+        const rotatedCanvas = document.createElement('canvas');
+        const rotatedCtx = rotatedCanvas.getContext('2d');
+        
+        // キャンバスサイズを交換（幅と高さを入れ替え）
+        rotatedCanvas.width = sampleImage.height;
+        rotatedCanvas.height = sampleImage.width;
+        
+        // 左に90°回転させる
+        rotatedCtx.translate(0, rotatedCanvas.width);
+        rotatedCtx.rotate(-Math.PI / 2);
+        rotatedCtx.drawImage(sampleImage, 0, 0);
+        
+        // 回転後の画像をoriginalImageに設定
+        originalImage = new Image();
+        originalImage.onload = function() {
+            createWorkingImages();
+        };
+        originalImage.src = rotatedCanvas.toDataURL();
+    };
+    sampleImage.onerror = function() {
+        console.log('Yamabuki.jpg is not available. select 360 image');
+    };
+    sampleImage.src = './Yamabuki.jpg';
+}
         
         // 構図ガイドライン画像の読み込み 20250811+
         function loadGuidelineImages() {
