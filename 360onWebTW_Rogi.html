@@ -746,15 +746,35 @@
         // 既存の変数群と一緒に宣言 20250814++
 let guidelineRotation = 0; // ここに追加
                 
-        window.addEventListener('load', function() {
-                loadSampleImage();        
-                loadGuidelineImages();// 20250811+
-                // window.addEventListener('load'内に追加
-                
-                // イベントリスナー追加（DOM要素取得後）// 20250811+
-                const guidelineSelect = document.getElementById('guidelineSelect');
-                guidelineSelect.addEventListener('change', function() {
-                    
+window.addEventListener('load', function() {
+    loadSampleImage();        
+    loadGuidelineImages();
+    
+    const guidelineSelect = document.getElementById('guidelineSelect');
+    guidelineSelect.addEventListener('change', function() {
+        guidelineRotation = 0;
+        render();
+    });
+    
+    // すべてのスライダーにダブルタップリセット機能を追加 20250819++
+    const allSliders = document.querySelectorAll('input[type="range"]');
+    allSliders.forEach(slider => {
+        let lastTapTime = 0;
+        slider.addEventListener('touchend', function(e) {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTapTime;
+            
+            // ダブルタップ判定（300ms以内）
+            if (tapLength < 300 && tapLength > 0) {
+                e.preventDefault();
+                slider.value = '0';
+                slider.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+            lastTapTime = currentTime;
+        });
+    });
+    
+});
     guidelineRotation = 0; // この行を追加 20250814++
                     
                 render(); // for draw guideline
